@@ -1,34 +1,30 @@
 const {app, BrowserWindow} = require('electron');
+const dotenv = require('dotenv');
+
+const appInit = require('./appInit');
 const webServer = require('./web/server');
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+// App stuff and serber startup
+dotenv.config();
+appInit();
+webServer({port: process.env.APP_PORT});
 
-webServer();
-
+// Main window init
 function initWin () {
   
     let win = new BrowserWindow({
-        width: "100%",
-        height: "100%",
+        width: 1000,
+        height: 700,
         webPreferences: {
           nodeIntegration: true
         }
     })
       // and load the index.html of the app.
-    win.loadURL('http://localhost:3000');
+    process.env.ENV === "dev" ? win.loadURL('http://localhost:3000') : win.loadFile("front/index.html");
     
 }
 
-// * creates appropriate directories
-try {
-  fs.mkdirSync(path.join(os.homedir(), "./documents", "./mongelit"))
-}catch{
-
-}
-
-
+// Magic starts !
 app.whenReady().then(initWin);
 
   

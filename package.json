@@ -1,10 +1,14 @@
 {
-  "name": "mongoDesk",
-  "version": "1.0.0",
+  "name": "mongelit",
+  "version": "0.0.9",
   "main": "app.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "npx kill-port 29928 && electron ."
+  },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "electron": "^9.2.0",
     "electron-packager": "^15.0.0",
     "electron-reload": "^1.5.0",

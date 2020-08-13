@@ -3,20 +3,20 @@ const router = require("./routes");
 const cors = require('cors');
 const morgan = require('morgan');
 
-function initServer() {
+function initServer(config) {
     const app = express();
 
     app.use(express.json());
     app.use(cors());
-    app.use(morgan("dev"))
+    if(process.env.ENV === "dev") app.use(morgan("dev"));
 
     app.get("/", (req, res) => {
-        res.send("ok");
+        res.send("hey mongo");
     });
 
     app.use("/", router);
 
-    app.listen(5001);
+    app.listen(config.port);
 
 
 
