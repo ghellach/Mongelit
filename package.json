@@ -4,7 +4,9 @@
   "main": "app.js",
   "license": "MIT",
   "scripts": {
-    "dev": "npx kill-port 29928 && electron ."
+    "kill-port": "npx kill-port 29928",
+    "dev": "yarn kill-port && cd web && nodemon server.js",
+    "start": "yarn kill-port && electron ."
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -13,6 +15,7 @@
     "electron-packager": "^15.0.0",
     "electron-reload": "^1.5.0",
     "express": "^4.17.1",
+    "moment": "^2.27.0",
     "mongodb": "^3.6.0",
     "morgan": "^1.10.0"
   }

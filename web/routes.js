@@ -2,6 +2,7 @@ const router = require('express').Router();
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const moment = require("moment");
 
 router.post("/list_collections", (req, res) => {
     // Connection url
@@ -29,27 +30,31 @@ router.post("/list_collections", (req, res) => {
     
 });
 
+
 router.post("/export_db", (req, res) => {
   
     // * initialize mongodb connection for the specified url and db
     const MongoClient = require("mongodb").MongoClient;
     const client = new MongoClient(req.body.url, { useUnifiedTopology: true });
+
+    const date = "./";
+    const fileLocation = path.join(os.homedir(), "./documents/mongelit/./", req.body.db, date, `db_${req.body.db}.json`);
     
 
     // * function that fetches collection content
-    function fetchCollection(col) {
+    function fetchCollectionAsSeparate(col) {
 
         MongoClient.connect(req.body.url, function(err, db) {
-
+    
             let full;
             if (err) throw err;
             
             var dbo = db.db(req.body.db);
             dbo.collection(col.name).find({}).toArray(function(err, result) {
                 if (err) throw err;
-
+    
                 // * writes found collection's documents to fs.
-                fs.writeFile(path.join(os.homedir(), "./documents/mongelit/./", req.body.db, `${col.name}.json`), JSON.stringify(result), function (err) {
+                fs.writeFile(path.join(os.homedir(), "./documents/mongelit/./", req.body.db, date, `${col.name}.json`), JSON.stringify(result), function (err) {
                 if (err) return console.log(err);
                 });
                 return result;
@@ -57,8 +62,37 @@ router.post("/export_db", (req, res) => {
             //db.close();
             return res.json(full);
         });
-
+    
     }
+    
+    function fetchCollectionAsUnique(col) {
+    
+        MongoClient.connect(req.body.url, function(err, db) {
+    
+            let full;
+            if (err) throw err;
+            
+            var dbo = db.db(req.body.db);
+            dbo.collection(col.name).find({}).toArray(function(err, result) {
+                if (err) throw err;
+    
+                console.log(1);
+                const current = JSON.parse(fs.readFileSync(fileLocation));
+                current[col.name] = result;
+                console.log(02)
+    
+                // * writes found collection's documents to fs.
+                fs.writeFile(fileLocation, JSON.stringify(current), function (err) {
+                if (err) return console.log(err);
+                });
+                return result;
+            });
+            //db.close();
+            return res.json(full);
+        });
+    
+    }
+    
 
     client
         .connect()
@@ -79,22 +113,44 @@ router.post("/export_db", (req, res) => {
 
             }
 
-            const dbFolder = path.join(os.homedir(), "./documents", "./mongelit", req.body.db)
+            const dbFolder = path.join(os.homedir(), "./documents", "./mongelit/", req.body.db,"/", date)
             try {
+                console.log(dbFolder);
+                fs.mkdirSync(path.join(os.homedir(), "./documents", "./mongelit/", req.body.db))
                 fs.mkdirSync(dbFolder)
             }catch{
 
             }
             
             // * performs fetch and fs write for each collection.
-            cols.forEach(col => {
+            if(req.body.separate) {
+                cols.forEach(col => {
+                    try {
+                        fetchCollectionAsSeparate(col);
+                    }catch(err) {
+                        throw err;
+                    }
+                    
+                })
+            }
+
+            if(req.body.unique) {
                 try {
-                    fetchCollection(col);
-                }catch(err) {
-                    throw err;
-                }
+                    console.log(fileLocation)
+                    fs.writeFileSync(fileLocation, "{}");
+                }catch(err){return res.json(err)}
+    
                 
-            })
+                // * performs fetch and fs write for each collection.
+                cols.forEach(col => {
+                    try {
+                        fetchCollectionAsUnique(col);
+                    }catch(err) {
+                        throw err;
+                    }
+                    
+                })
+            }
 
             return res.json({
                 message: "All collections exported successfully to " + dbFolder,

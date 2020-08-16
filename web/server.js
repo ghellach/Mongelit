@@ -2,6 +2,7 @@ const express = require('express');
 const router = require("./routes");
 const cors = require('cors');
 const morgan = require('morgan');
+const dotenv = require('dotenv');
 
 function initServer(config) {
     const app = express();
@@ -22,5 +23,9 @@ function initServer(config) {
 
 
 }
+
+dotenv.config({path:"../.env"});
+
+initServer({port : process.env.APP_PORT});
 
 module.exports = initServer;
