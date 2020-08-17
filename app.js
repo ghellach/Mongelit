@@ -15,6 +15,7 @@ function initWin () {
     let win = new BrowserWindow({
         width: 1000,
         height: 700,
+        resizable: false,
         webPreferences: {
           nodeIntegration: true
         }

@@ -1,6 +1,8 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
+import {BrowserRouter, Route} from 'react-router-dom';
+import Navbar from './Components/Navbar';
 
 class App extends React.Component {
 
@@ -18,9 +20,11 @@ class App extends React.Component {
     fetchCollection = e => {
         e.preventDefault();
 
-        axios.post("http://localhost:5001/export_db", {
+        axios.post("http://localhost:29928/export_db", {
             url: this.state.url,
             db: this.state.db,
+            unique: true,
+            separate: true
         }).then(res => {
             //this.setState({collections: res.data})
             //console.log(res.data);
@@ -33,22 +37,13 @@ class App extends React.Component {
       <li>{collection.name}</li>
     ))
     return (
-        <div className="container">
-            <br/>
-            <div className="card">
-                <div className="card-body">
-                    <h1>Hey</h1>
-                    <form onSubmit={this.fetchCollection}>
-                        <div className="form-group">
-                            <input className="form-control" name="url" placeholder="url" onChange={this.onChange} value={this.state.url}></input>
-                            <input className="form-control" name="db" placeholder="db" onChange={this.onChange} value={this.state.db}></input>
-                            <button type="submit" className="btn btn-success btn-block">Submit</button>
-                        </div>
-                    </form>
-                    {list}
-                </div>
+        <React.Fragment>
+            <Navbar />
+            <div className="container">
+            
             </div>
-        </div>
+        </React.Fragment>
+        
       
     );
   }

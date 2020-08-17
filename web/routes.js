@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const moment = require("moment");
+const mongoose = require('mongoose');
 
 router.post("/list_collections", (req, res) => {
     // Connection url
@@ -32,6 +33,8 @@ router.post("/list_collections", (req, res) => {
 
 
 router.post("/export_db", (req, res) => {
+
+    // ! I don't like how MongoDB actions are done in this code. Should be remade !
   
     // * initialize mongodb connection for the specified url and db
     const MongoClient = require("mongodb").MongoClient;
